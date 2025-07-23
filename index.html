@@ -7,13 +7,563 @@
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <style>
+        /* Reset and base styles */
+        * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+        }
+        
+        body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+            'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+            sans-serif;
+          -webkit-font-smoothing: antialiased;
+          -moz-osx-font-smoothing: grayscale;
+          transition: background-color 0.3s ease, color 0.3s ease;
+        }
+        
+        /* Light mode variables */
+        body.light-mode {
+          --bg-primary: #ffffff;
+          --bg-secondary: #f8f9fa;
+          --bg-tertiary: #e9ecef;
+          --text-primary: #212529;
+          --text-secondary: #6c757d;
+          --text-muted: #adb5bd;
+          --border-color: #dee2e6;
+          --shadow-light: rgba(0, 0, 0, 0.1);
+          --shadow-medium: rgba(0, 0, 0, 0.15);
+          --accent-color: #007bff;
+          --accent-hover: #0056b3;
+          --success-color: #28a745;
+          --danger-color: #dc3545;
+          --danger-hover: #c82333;
+        }
+        
+        /* Dark mode variables */
+        body.dark-mode {
+          --bg-primary: #1a1a1a;
+          --bg-secondary: #2d2d2d;
+          --bg-tertiary: #404040;
+          --text-primary: #ffffff;
+          --text-secondary: #b0b0b0;
+          --text-muted: #808080;
+          --border-color: #404040;
+          --shadow-light: rgba(0, 0, 0, 0.3);
+          --shadow-medium: rgba(0, 0, 0, 0.5);
+          --accent-color: #4dabf7;
+          --accent-hover: #339af0;
+          --success-color: #51cf66;
+          --danger-color: #ff6b6b;
+          --danger-hover: #fa5252;
+        }
+        
+        /* App container */
+        .app {
+          min-height: 100vh;
+          background-color: var(--bg-secondary);
+          color: var(--text-primary);
+          padding: 20px;
+          transition: all 0.3s ease;
+        }
+        
+        .container {
+          max-width: 600px;
+          margin: 0 auto;
+          background-color: var(--bg-primary);
+          border-radius: 12px;
+          box-shadow: 0 4px 20px var(--shadow-light);
+          overflow: hidden;
+          transition: all 0.3s ease;
+        }
+        
+        /* Header */
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 24px 32px;
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-hover));
+          color: white;
+        }
+        
+        .title {
+          font-size: 28px;
+          font-weight: 700;
+          margin: 0;
+        }
+        
+        .theme-toggle {
+          background: rgba(255, 255, 255, 0.2);
+          border: none;
+          border-radius: 50%;
+          width: 48px;
+          height: 48px;
+          font-size: 20px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .theme-toggle:hover {
+          background: rgba(255, 255, 255, 0.3);
+          transform: scale(1.1);
+        }
+        
+        /* Input section */
+        .input-section {
+          display: flex;
+          gap: 12px;
+          padding: 24px 32px;
+          border-bottom: 1px solid var(--border-color);
+        }
+        
+        .todo-input {
+          flex: 1;
+          padding: 14px 16px;
+          border: 2px solid var(--border-color);
+          border-radius: 8px;
+          font-size: 16px;
+          background-color: var(--bg-primary);
+          color: var(--text-primary);
+          transition: all 0.3s ease;
+        }
+        
+        .todo-input:focus {
+          outline: none;
+          border-color: var(--accent-color);
+          box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+        }
+        
+        .todo-input::placeholder {
+          color: var(--text-muted);
+        }
+        
+        .add-button {
+          padding: 14px 24px;
+          background-color: var(--accent-color);
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-size: 16px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+        
+        .add-button:hover {
+          background-color: var(--accent-hover);
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px var(--shadow-medium);
+        }
+        
+        .add-button:active {
+          transform: translateY(0);
+        }
+        
+        /* Stats */
+        .stats {
+          padding: 16px 32px;
+          background-color: var(--bg-secondary);
+          border-bottom: 1px solid var(--border-color);
+        }
+        
+        .stats-text {
+          color: var(--text-secondary);
+          font-size: 14px;
+          font-weight: 500;
+        }
+        
+        /* Todo list */
+        .todo-list {
+          max-height: 500px;
+          overflow-y: auto;
+        }
+        
+        .empty-state {
+          padding: 48px 32px;
+          text-align: center;
+          color: var(--text-muted);
+        }
+        
+        .empty-state p {
+          font-size: 16px;
+          font-style: italic;
+        }
+        
+        /* Todo item */
+        .todo-item {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 16px 32px;
+          border-bottom: 1px solid var(--border-color);
+          transition: all 0.3s ease;
+          animation: slideIn 0.3s ease;
+        }
+        
+        .todo-item:hover {
+          background-color: var(--bg-secondary);
+        }
+        
+        .todo-item:last-child {
+          border-bottom: none;
+        }
+        
+        .todo-content {
+          display: flex;
+          align-items: center;
+          gap: 16px;
+          flex: 1;
+        }
+        
+        .checkbox {
+          width: 24px;
+          height: 24px;
+          border: 2px solid var(--border-color);
+          border-radius: 6px;
+          background-color: transparent;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: all 0.3s ease;
+          position: relative;
+        }
+        
+        .checkbox:hover {
+          border-color: var(--success-color);
+          transform: scale(1.1);
+        }
+        
+        .todo-item.completed .checkbox {
+          background-color: var(--success-color);
+          border-color: var(--success-color);
+          animation: checkboxComplete 0.3s ease;
+        }
+        
+        .checkmark {
+          color: white;
+          font-weight: bold;
+          font-size: 14px;
+          animation: checkmarkAppear 0.3s ease;
+        }
+        
+        .todo-text {
+          font-size: 16px;
+          color: var(--text-primary);
+          transition: all 0.3s ease;
+          flex: 1;
+        }
+        
+        .todo-item.completed .todo-text {
+          color: var(--text-muted);
+          text-decoration: line-through;
+          animation: strikethrough 0.3s ease;
+        }
+        
+        .delete-button {
+          width: 32px;
+          height: 32px;
+          border: none;
+          background-color: transparent;
+          color: var(--text-muted);
+          font-size: 20px;
+          font-weight: bold;
+          cursor: pointer;
+          border-radius: 6px;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+        
+        .delete-button:hover {
+          background-color: var(--danger-color);
+          color: white;
+          transform: scale(1.1);
+          animation: deleteHover 0.3s ease;
+        }
+        
+        /* Animations */
+        @keyframes slideIn {
+          from {
+            opacity: 0;
+            transform: translateX(-20px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+        
+        @keyframes checkboxComplete {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.2);
+          }
+          100% {
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes checkmarkAppear {
+          from {
+            opacity: 0;
+            transform: scale(0.5);
+          }
+          to {
+            opacity: 1;
+            transform: scale(1);
+          }
+        }
+        
+        @keyframes strikethrough {
+          from {
+            text-decoration: none;
+            opacity: 1;
+          }
+          to {
+            text-decoration: line-through;
+            opacity: 0.6;
+          }
+        }
+        
+        @keyframes deleteHover {
+          0% {
+            transform: scale(1);
+          }
+          50% {
+            transform: scale(1.2) rotate(90deg);
+          }
+          100% {
+            transform: scale(1.1);
+          }
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+          .app {
+            padding: 10px;
+          }
+          
+          .container {
+            border-radius: 8px;
+          }
+          
+          .header {
+            padding: 20px 24px;
+          }
+          
+          .title {
+            font-size: 24px;
+          }
+          
+          .input-section {
+            padding: 20px 24px;
+            flex-direction: column;
+          }
+          
+          .todo-input {
+            margin-bottom: 12px;
+          }
+          
+          .add-button {
+            width: 100%;
+          }
+          
+          .stats {
+            padding: 12px 24px;
+          }
+          
+          .todo-item {
+            padding: 12px 24px;
+          }
+          
+          .todo-text {
+            font-size: 15px;
+          }
+        }
+        
+        /* Scrollbar styling */
+        .todo-list::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        .todo-list::-webkit-scrollbar-track {
+          background: var(--bg-secondary);
+        }
+        
+        .todo-list::-webkit-scrollbar-thumb {
+          background: var(--border-color);
+          border-radius: 3px;
+        }
+        
+        .todo-list::-webkit-scrollbar-thumb:hover {
+          background: var(--text-muted);
+        }
+    </style>
 </head>
 <body>
     <div id="root"></div>
     
-    <script type="text/babel" src="TodoItem.jsx"></script>
-    <script type="text/babel" src="App.jsx"></script>
     <script type="text/babel">
+        // TodoItem Component
+        const TodoItem = ({ todo, onToggleComplete, onDelete }) => {
+          return (
+            <div className={`todo-item ${todo.completed ? 'completed' : ''}`}>
+              <div className="todo-content">
+                <button
+                  className="checkbox"
+                  onClick={() => onToggleComplete(todo.id)}
+                  aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
+                >
+                  {todo.completed && <span className="checkmark">✓</span>}
+                </button>
+                <span className="todo-text">{todo.text}</span>
+              </div>
+              <button
+                className="delete-button"
+                onClick={() => onDelete(todo.id)}
+                aria-label="Delete todo"
+              >
+                ×
+              </button>
+            </div>
+          );
+        };
+
+        // Main App Component
+        const App = () => {
+          const [todos, setTodos] = React.useState([]);
+          const [inputValue, setInputValue] = React.useState('');
+          const [darkMode, setDarkMode] = React.useState(false);
+
+          // Load todos and theme from localStorage on component mount
+          React.useEffect(() => {
+            const savedTodos = localStorage.getItem('todos');
+            const savedTheme = localStorage.getItem('darkMode');
+            
+            if (savedTodos) {
+              setTodos(JSON.parse(savedTodos));
+            }
+            
+            if (savedTheme) {
+              setDarkMode(JSON.parse(savedTheme));
+            }
+          }, []);
+
+          // Save todos to localStorage whenever todos change
+          React.useEffect(() => {
+            localStorage.setItem('todos', JSON.stringify(todos));
+          }, [todos]);
+
+          // Save theme to localStorage whenever theme changes
+          React.useEffect(() => {
+            localStorage.setItem('darkMode', JSON.stringify(darkMode));
+            document.body.className = darkMode ? 'dark-mode' : 'light-mode';
+          }, [darkMode]);
+
+          const addTodo = () => {
+            if (inputValue.trim() !== '') {
+              const newTodo = {
+                id: Date.now(),
+                text: inputValue.trim(),
+                completed: false
+              };
+              setTodos([...todos, newTodo]);
+              setInputValue('');
+            }
+          };
+
+          const toggleComplete = (id) => {
+            setTodos(todos.map(todo =>
+              todo.id === id ? { ...todo, completed: !todo.completed } : todo
+            ));
+          };
+
+          const deleteTodo = (id) => {
+            setTodos(todos.filter(todo => todo.id !== id));
+          };
+
+          const handleKeyPress = (e) => {
+            if (e.key === 'Enter') {
+              addTodo();
+            }
+          };
+
+          const toggleTheme = () => {
+            setDarkMode(!darkMode);
+          };
+
+          const completedCount = todos.filter(todo => todo.completed).length;
+          const totalCount = todos.length;
+
+          return (
+            <div className={`app ${darkMode ? 'dark' : 'light'}`}>
+              <div className="container">
+                <header className="header">
+                  <h1 className="title">My Todo List</h1>
+                  <button 
+                    className="theme-toggle"
+                    onClick={toggleTheme}
+                    aria-label="Toggle theme"
+                  >
+                    {darkMode ? '☀️' : '🌙'}
+                  </button>
+                </header>
+
+                <div className="input-section">
+                  <input
+                    type="text"
+                    value={inputValue}
+                    onChange={(e) => setInputValue(e.target.value)}
+                    onKeyPress={handleKeyPress}
+                    placeholder="Add a new todo..."
+                    className="todo-input"
+                  />
+                  <button onClick={addTodo} className="add-button">
+                    Add
+                  </button>
+                </div>
+
+                {totalCount > 0 && (
+                  <div className="stats">
+                    <span className="stats-text">
+                      {completedCount} of {totalCount} completed
+                    </span>
+                  </div>
+                )}
+
+                <div className="todo-list">
+                  {todos.length === 0 ? (
+                    <div className="empty-state">
+                      <p>No todos yet. Add one above!</p>
+                    </div>
+                  ) : (
+                    todos.map((todo) => (
+                      <TodoItem
+                        key={todo.id}
+                        todo={todo}
+                        onToggleComplete={toggleComplete}
+                        onDelete={deleteTodo}
+                      />
+                    ))
+                  )}
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // Render the app
         const { createRoot } = ReactDOM;
         const root = createRoot(document.getElementById('root'));
         root.render(<App />);
