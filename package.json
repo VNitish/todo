@@ -1,0 +1,40 @@
+{
+  "name": "react-todo-app",
+  "version": "1.0.0",
+  "description": "A simple React todo list application with light/dark mode and animations",
+  "main": "App.jsx",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve -s .",
+    "build": "echo 'Build script - copy files to build directory'",
+    "test": "echo 'No tests specified'"
+  },
+  "keywords": [
+    "react",
+    "todo",
+    "todo-list",
+    "javascript",
+    "frontend"
+  ],
+  "author": "Assistant",
+  "license": "MIT",
+  "dependencies": {
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0"
+  },
+  "devDependencies": {
+    "serve": "^14.2.0"
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
+}
