@@ -4,8 +4,12 @@
   "description": "A simple React todo list application with light/dark mode and animations",
   "main": "App.jsx",
   "scripts": {
-    "start": "npx serve .",
-    "dev": "npx serve -s .",
+    "start": "npx serve . -p 3000",
+    "start:8080": "npx serve . -p 8080",
+    "start:5000": "npx serve . -p 5000",
+    "start:4000": "npx serve . -p 4000",
+    "dev": "npx serve . -p 8080",
+    "serve": "npx serve .",
     "build": "echo 'Build script - copy files to build directory'",
     "test": "echo 'No tests specified'"
   },
