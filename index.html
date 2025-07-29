@@ -3,853 +3,387 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sleek Todo App</title>
+    <title>API Keys Management</title>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        /* Reset and base styles */
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
-        
-        body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
-          -webkit-font-smoothing: antialiased;
-          -moz-osx-font-smoothing: grayscale;
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          overflow-x: hidden;
-        }
-        
-        /* Light mode variables */
-        body.light-mode {
-          --bg-primary: #ffffff;
-          --bg-secondary: #f8fafc;
-          --bg-tertiary: #e2e8f0;
-          --bg-glass: rgba(255, 255, 255, 0.8);
-          --text-primary: #0f172a;
-          --text-secondary: #475569;
-          --text-muted: #94a3b8;
-          --border-color: #e2e8f0;
-          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-          --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-          --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-          --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
-          --accent-color: #3b82f6;
-          --accent-hover: #2563eb;
-          --accent-light: #dbeafe;
-          --success-color: #10b981;
-          --success-light: #d1fae5;
-          --danger-color: #ef4444;
-          --danger-hover: #dc2626;
-          --danger-light: #fee2e2;
-          --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-          --blur-bg: blur(20px);
-        }
-        
-        /* Dark mode variables */
-        body.dark-mode {
-          --bg-primary: #0f172a;
-          --bg-secondary: #1e293b;
-          --bg-tertiary: #334155;
-          --bg-glass: rgba(15, 23, 42, 0.8);
-          --text-primary: #f8fafc;
-          --text-secondary: #cbd5e1;
-          --text-muted: #64748b;
-          --border-color: #334155;
-          --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-          --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
-          --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
-          --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
-          --accent-color: #60a5fa;
-          --accent-hover: #3b82f6;
-          --accent-light: #1e3a8a;
-          --success-color: #34d399;
-          --success-light: #064e3b;
-          --danger-color: #f87171;
-          --danger-hover: #ef4444;
-          --danger-light: #7f1d1d;
-          --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          --gradient-secondary: linear-gradient(135deg, #a78bfa 0%, #f472b6 100%);
-          --blur-bg: blur(20px);
-        }
-
-        /* Background patterns */
-        body::before {
-          content: '';
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          background: var(--bg-secondary);
-          background-image: 
-            radial-gradient(circle at 25% 25%, rgba(59, 130, 246, 0.1) 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.1) 0%, transparent 50%);
-          z-index: -2;
-        }
-
-        body.dark-mode::before {
-          background-image: 
-            radial-gradient(circle at 25% 25%, rgba(96, 165, 250, 0.15) 0%, transparent 50%),
-            radial-gradient(circle at 75% 75%, rgba(168, 85, 247, 0.15) 0%, transparent 50%);
-        }
-        
-        /* App container - Full screen */
-        .app {
-          min-height: 100vh;
-          width: 100vw;
-          background: transparent;
-          color: var(--text-primary);
-          display: flex;
-          flex-direction: column;
-          position: relative;
-        }
-
-        /* Floating background elements */
-        .floating-shapes {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100%;
-          height: 100%;
-          pointer-events: none;
-          z-index: -1;
-        }
-
-        .shape {
-          position: absolute;
-          border-radius: 50%;
-          background: var(--gradient-primary);
-          opacity: 0.1;
-          animation: float 20s infinite ease-in-out;
-        }
-
-        .shape:nth-child(1) {
-          width: 200px;
-          height: 200px;
-          top: 10%;
-          left: 10%;
-          animation-delay: 0s;
-        }
-
-        .shape:nth-child(2) {
-          width: 150px;
-          height: 150px;
-          top: 60%;
-          right: 15%;
-          animation-delay: -5s;
-        }
-
-        .shape:nth-child(3) {
-          width: 100px;
-          height: 100px;
-          bottom: 20%;
-          left: 20%;
-          animation-delay: -10s;
-        }
-
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) rotate(0deg); }
-          33% { transform: translateY(-30px) rotate(120deg); }
-          66% { transform: translateY(20px) rotate(240deg); }
-        }
-        
-        /* Header - Full width */
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 2rem 4rem;
-          background: var(--bg-glass);
-          backdrop-filter: var(--blur-bg);
-          border-bottom: 1px solid var(--border-color);
-          position: sticky;
-          top: 0;
-          z-index: 100;
-        }
-        
-        .title {
-          font-size: 2.5rem;
-          font-weight: 700;
-          background: var(--gradient-primary);
-          -webkit-background-clip: text;
-          -webkit-text-fill-color: transparent;
-          background-clip: text;
-          margin: 0;
-          letter-spacing: -0.025em;
-        }
-
-        .header-controls {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-        }
-
-        .stats-header {
-          display: flex;
-          align-items: center;
-          gap: 0.75rem;
-          padding: 0.75rem 1.5rem;
-          background: var(--bg-primary);
-          border: 1px solid var(--border-color);
-          border-radius: 2rem;
-          box-shadow: var(--shadow-sm);
-        }
-
-        .stats-circle {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          background: var(--success-color);
-          animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-          0%, 100% { transform: scale(1); opacity: 1; }
-          50% { transform: scale(1.2); opacity: 0.8; }
-        }
-
-        .stats-text {
-          font-size: 0.875rem;
-          font-weight: 500;
-          color: var(--text-secondary);
-          white-space: nowrap;
-        }
-        
-        /* Enhanced Theme Toggle */
-        .theme-toggle {
-          position: relative;
-          width: 60px;
-          height: 32px;
-          background: var(--bg-tertiary);
-          border: 2px solid var(--border-color);
-          border-radius: 2rem;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          overflow: hidden;
-        }
-
-        .theme-toggle:hover {
-          transform: scale(1.05);
-          box-shadow: var(--shadow-lg);
-        }
-
-        .theme-toggle::before {
-          content: '';
-          position: absolute;
-          top: 2px;
-          left: 2px;
-          width: 24px;
-          height: 24px;
-          background: var(--gradient-primary);
-          border-radius: 50%;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: var(--shadow-md);
-        }
-
-        .theme-toggle.dark::before {
-          transform: translateX(28px);
-          background: var(--gradient-secondary);
-        }
-
-        .theme-icon {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          font-size: 14px;
-          transition: all 0.3s ease;
-        }
-
-        .theme-icon.sun {
-          left: 6px;
-          opacity: 1;
-        }
-
-        .theme-icon.moon {
-          right: 6px;
-          opacity: 0.3;
-        }
-
-        .theme-toggle.dark .theme-icon.sun {
-          opacity: 0.3;
-        }
-
-        .theme-toggle.dark .theme-icon.moon {
-          opacity: 1;
-        }
-        
-        /* Main content area */
-        .main-content {
-          flex: 1;
-          display: flex;
-          flex-direction: column;
-          max-width: 1200px;
-          margin: 0 auto;
-          width: 100%;
-          padding: 3rem 4rem;
-          gap: 3rem;
-        }
-
-        /* Input section - Enhanced */
-        .input-section {
-          display: flex;
-          gap: 1rem;
-          align-items: stretch;
-          background: var(--bg-glass);
-          backdrop-filter: var(--blur-bg);
-          padding: 2rem;
-          border-radius: 2rem;
-          border: 1px solid var(--border-color);
-          box-shadow: var(--shadow-xl);
-          transition: all 0.3s ease;
-        }
-
-        .input-section:hover {
-          transform: translateY(-2px);
-          box-shadow: var(--shadow-xl);
-        }
-        
-        .todo-input {
-          flex: 1;
-          padding: 1.25rem 1.75rem;
-          border: 2px solid var(--border-color);
-          border-radius: 1.5rem;
-          font-size: 1.125rem;
-          font-weight: 400;
-          background: var(--bg-primary);
-          color: var(--text-primary);
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: var(--shadow-sm);
-        }
-        
-        .todo-input:focus {
-          outline: none;
-          border-color: var(--accent-color);
-          box-shadow: 0 0 0 4px var(--accent-light), var(--shadow-md);
-          transform: translateY(-1px);
-        }
-        
-        .todo-input::placeholder {
-          color: var(--text-muted);
-          font-weight: 400;
-        }
-        
-        .add-button {
-          padding: 1.25rem 2.5rem;
-          background: var(--gradient-primary);
-          color: white;
-          border: none;
-          border-radius: 1.5rem;
-          font-size: 1.125rem;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          white-space: nowrap;
-          box-shadow: var(--shadow-md);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .add-button::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
-          transition: left 0.5s;
-        }
-
-        .add-button:hover::before {
-          left: 100%;
-        }
-        
-        .add-button:hover {
-          transform: translateY(-3px) scale(1.02);
-          box-shadow: var(--shadow-xl);
-        }
-        
-        .add-button:active {
-          transform: translateY(-1px) scale(0.98);
-        }
-        
-        /* Todo list - Grid layout for better space utilization */
-        .todo-list {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-          gap: 1.5rem;
-          max-height: none;
-          overflow: visible;
-        }
-
-        .empty-state {
-          grid-column: 1 / -1;
-          padding: 4rem 2rem;
-          text-align: center;
-          color: var(--text-muted);
-          background: var(--bg-glass);
-          backdrop-filter: var(--blur-bg);
-          border-radius: 2rem;
-          border: 2px dashed var(--border-color);
-        }
-        
-        .empty-state p {
-          font-size: 1.25rem;
-          font-weight: 400;
-          margin-bottom: 1rem;
-        }
-
-        .empty-state-icon {
-          font-size: 4rem;
-          margin-bottom: 1rem;
-          opacity: 0.5;
-        }
-        
-        /* Todo item - Card design */
-        .todo-item {
-          display: flex;
-          align-items: center;
-          justify-content: space-between;
-          padding: 1.5rem 2rem;
-          background: var(--bg-glass);
-          backdrop-filter: var(--blur-bg);
-          border: 1px solid var(--border-color);
-          border-radius: 1.5rem;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          animation: slideIn 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-          box-shadow: var(--shadow-md);
-          position: relative;
-          overflow: hidden;
-        }
-
-        .todo-item::before {
-          content: '';
-          position: absolute;
-          top: 0;
-          left: 0;
-          width: 4px;
-          height: 100%;
-          background: var(--accent-color);
-          transform: scaleY(0);
-          transition: transform 0.3s ease;
-        }
-        
-        .todo-item:hover {
-          transform: translateY(-4px) scale(1.02);
-          box-shadow: var(--shadow-xl);
-          border-color: var(--accent-color);
-        }
-
-        .todo-item:hover::before {
-          transform: scaleY(1);
-        }
-
-        .todo-item.completed {
-          opacity: 0.7;
-          background: var(--success-light);
-        }
-
-        .todo-item.completed::before {
-          background: var(--success-color);
-          transform: scaleY(1);
-        }
-        
-        .todo-content {
-          display: flex;
-          align-items: center;
-          gap: 1.5rem;
-          flex: 1;
-        }
-        
-        .checkbox {
-          width: 28px;
-          height: 28px;
-          border: 2px solid var(--border-color);
-          border-radius: 50%;
-          background: var(--bg-primary);
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          position: relative;
-          box-shadow: var(--shadow-sm);
-        }
-        
-        .checkbox:hover {
-          border-color: var(--success-color);
-          transform: scale(1.1);
-          box-shadow: 0 0 0 4px var(--success-light);
-        }
-        
-        .todo-item.completed .checkbox {
-          background: var(--success-color);
-          border-color: var(--success-color);
-          animation: checkboxComplete 0.6s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .checkmark {
-          color: white;
-          font-weight: bold;
-          font-size: 16px;
-          animation: checkmarkAppear 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .todo-text {
-          font-size: 1.125rem;
-          font-weight: 500;
-          color: var(--text-primary);
-          transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-          flex: 1;
-          line-height: 1.5;
-        }
-        
-        .todo-item.completed .todo-text {
-          color: var(--text-muted);
-          text-decoration: line-through;
-          animation: strikethrough 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        
-        .delete-button {
-          width: 40px;
-          height: 40px;
-          border: none;
-          background: var(--danger-light);
-          color: var(--danger-color);
-          font-size: 18px;
-          font-weight: bold;
-          cursor: pointer;
-          border-radius: 50%;
-          transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: var(--shadow-sm);
-        }
-        
-        .delete-button:hover {
-          background: var(--danger-color);
-          color: white;
-          transform: scale(1.1) rotate(90deg);
-          box-shadow: var(--shadow-lg);
-        }
-        
-        /* Enhanced Animations */
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateY(20px) scale(0.9);
-          }
-          to {
-            opacity: 1;
-            transform: translateY(0) scale(1);
-          }
-        }
-        
-        @keyframes checkboxComplete {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.3) rotate(180deg); }
-          100% { transform: scale(1) rotate(360deg); }
-        }
-        
-        @keyframes checkmarkAppear {
-          from {
-            opacity: 0;
-            transform: scale(0.3) rotate(-45deg);
-          }
-          to {
-            opacity: 1;
-            transform: scale(1) rotate(0deg);
-          }
-        }
-        
-        @keyframes strikethrough {
-          from {
-            text-decoration: none;
-            opacity: 1;
-            transform: scale(1);
-          }
-          to {
-            text-decoration: line-through;
-            opacity: 0.6;
-            transform: scale(0.98);
-          }
-        }
-        
-        /* Responsive design */
-        @media (max-width: 1024px) {
-          .main-content {
-            padding: 2rem;
-          }
-          
-          .header {
-            padding: 1.5rem 2rem;
-          }
-          
-          .title {
-            font-size: 2rem;
-          }
-          
-          .todo-list {
-            grid-template-columns: 1fr;
-          }
-        }
-
-        @media (max-width: 768px) {
-          .header {
-            padding: 1rem 1.5rem;
-            flex-direction: column;
-            gap: 1rem;
-          }
-          
-          .title {
-            font-size: 1.75rem;
-          }
-          
-          .header-controls {
-            width: 100%;
-            justify-content: space-between;
-          }
-          
-          .main-content {
-            padding: 1.5rem;
-            gap: 2rem;
-          }
-          
-          .input-section {
-            flex-direction: column;
-            padding: 1.5rem;
-          }
-          
-          .todo-input {
-            margin-bottom: 0;
-          }
-          
-          .todo-item {
-            padding: 1.25rem 1.5rem;
-          }
-          
-          .todo-text {
-            font-size: 1rem;
-          }
-
-          .todo-list {
-            grid-template-columns: 1fr;
-            gap: 1rem;
-          }
-        }
-
-        /* Custom scrollbar */
-        ::-webkit-scrollbar {
-          width: 8px;
-        }
-        
-        ::-webkit-scrollbar-track {
-          background: var(--bg-secondary);
-          border-radius: 4px;
-        }
-        
-        ::-webkit-scrollbar-thumb {
-          background: var(--border-color);
-          border-radius: 4px;
-          transition: background 0.3s ease;
-        }
-        
-        ::-webkit-scrollbar-thumb:hover {
-          background: var(--text-muted);
-        }
-
-        /* Loading animation for initial render */
-        .app.loading {
-          opacity: 0;
-          animation: fadeIn 0.8s ease forwards;
-        }
-
-        @keyframes fadeIn {
-          to {
-            opacity: 1;
-          }
-        }
-    </style>
+    <link rel="stylesheet" href="App.css">
 </head>
 <body>
     <div id="root"></div>
     
     <script type="text/babel">
-        // TodoItem Component
-        const TodoItem = ({ todo, onToggleComplete, onDelete }) => {
-          return (
-            <div className={`todo-item ${todo.completed ? 'completed' : ''}`}>
-              <div className="todo-content">
-                <button
-                  className="checkbox"
-                  onClick={() => onToggleComplete(todo.id)}
-                  aria-label={todo.completed ? 'Mark as incomplete' : 'Mark as complete'}
-                >
-                  {todo.completed && <span className="checkmark">✓</span>}
-                </button>
-                <span className="todo-text">{todo.text}</span>
-              </div>
-              <button
-                className="delete-button"
-                onClick={() => onDelete(todo.id)}
-                aria-label="Delete todo"
-              >
-                ×
-              </button>
-            </div>
+        // Load the main App component
+        const { useState, useEffect } = React;
+        
+        // Import all components (we'll define them inline for the HTML version)
+        
+        // Sidebar Component
+        const Sidebar = ({ onProfileClick }) => {
+          return React.createElement('aside', { className: 'sidebar' },
+            React.createElement('div', { className: 'sidebar-header' },
+              React.createElement('div', { className: 'logo' },
+                React.createElement('h2', null, 'zupee')
+              )
+            ),
+            React.createElement('nav', { className: 'sidebar-nav' },
+              React.createElement('ul', { className: 'nav-list' },
+                React.createElement('li', { className: 'nav-item active' },
+                  React.createElement('a', { href: '#', className: 'nav-link' },
+                    React.createElement('span', { className: 'nav-icon' }, '🔑'),
+                    'API Keys'
+                  )
+                )
+              )
+            ),
+            React.createElement('div', { className: 'sidebar-footer' },
+              React.createElement('div', { className: 'user-profile', onClick: onProfileClick },
+                React.createElement('div', { className: 'user-avatar' },
+                  React.createElement('span', null, 'N')
+                ),
+                React.createElement('div', { className: 'user-info' },
+                  React.createElement('span', { className: 'user-name' }, 'nitish naidu')
+                )
+              )
+            )
+          );
+        };
+
+        // API Key Table Component
+        const APIKeyTable = ({ apiKeys, onEditKey, onDeleteKey }) => {
+          const formatDate = (dateString) => {
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', {
+              year: 'numeric',
+              month: 'short',
+              day: 'numeric'
+            });
+          };
+
+          const truncateKey = (key) => {
+            if (key.length > 20) {
+              return `${key.substring(0, 12)}...${key.substring(key.length - 4)}`;
+            }
+            return key;
+          };
+
+          return React.createElement('div', { className: 'table-wrapper' },
+            React.createElement('table', { className: 'api-keys-table' },
+              React.createElement('thead', null,
+                React.createElement('tr', null,
+                  React.createElement('th', null, 'NAME'),
+                  React.createElement('th', null, 'KEY'),
+                  React.createElement('th', null, 'CREATED AT'),
+                  React.createElement('th', null, 'CREATED BY'),
+                  React.createElement('th', null, 'LAST UPDATED'),
+                  React.createElement('th', null, 'TYPE'),
+                  React.createElement('th', null, 'ACTIONS')
+                )
+              ),
+              React.createElement('tbody', null,
+                apiKeys.length === 0 
+                  ? React.createElement('tr', null,
+                      React.createElement('td', { colSpan: 7, className: 'no-data' }, 'No API keys found')
+                    )
+                  : apiKeys.map((key) =>
+                      React.createElement('tr', { key: key.id },
+                        React.createElement('td', { className: 'key-name' }, key.name),
+                        React.createElement('td', { className: 'key-value' },
+                          React.createElement('code', null, truncateKey(key.key))
+                        ),
+                        React.createElement('td', null, formatDate(key.createdAt)),
+                        React.createElement('td', null, key.createdBy),
+                        React.createElement('td', null, formatDate(key.lastUpdated)),
+                        React.createElement('td', null,
+                          React.createElement('span', { className: `type-badge ${key.type.toLowerCase()}` }, key.type)
+                        ),
+                        React.createElement('td', { className: 'actions' },
+                          React.createElement('button', {
+                            onClick: () => onEditKey(key),
+                            className: 'action-btn edit-btn',
+                            title: 'Edit API Key'
+                          }, '✏️'),
+                          React.createElement('button', {
+                            onClick: () => onDeleteKey(key.id),
+                            className: 'action-btn delete-btn',
+                            title: 'Delete API Key'
+                          }, '🗑️')
+                        )
+                      )
+                    )
+              )
+            )
+          );
+        };
+
+        // Profile Modal Component
+        const ProfileModal = ({ onClose }) => {
+          return React.createElement('div', { className: 'modal-overlay', onClick: onClose },
+            React.createElement('div', { className: 'modal-content', onClick: (e) => e.stopPropagation() },
+              React.createElement('div', { className: 'modal-header' },
+                React.createElement('h2', null, 'User Profile'),
+                React.createElement('button', { onClick: onClose, className: 'close-btn' }, '✕')
+              ),
+              React.createElement('div', { className: 'profile-content' },
+                React.createElement('div', { className: 'profile-avatar-section' },
+                  React.createElement('div', { className: 'profile-avatar-large' },
+                    React.createElement('span', null, 'N')
+                  ),
+                  React.createElement('h3', null, 'Nitish Naidu'),
+                  React.createElement('p', { className: 'profile-email' }, 'nitish.naidu@zupee.com')
+                ),
+                React.createElement('div', { className: 'profile-details' },
+                  React.createElement('div', { className: 'detail-row' },
+                    React.createElement('span', { className: 'detail-label' }, 'Role:'),
+                    React.createElement('span', { className: 'detail-value' }, 'Developer')
+                  ),
+                  React.createElement('div', { className: 'detail-row' },
+                    React.createElement('span', { className: 'detail-label' }, 'Department:'),
+                    React.createElement('span', { className: 'detail-value' }, 'Engineering')
+                  ),
+                  React.createElement('div', { className: 'detail-row' },
+                    React.createElement('span', { className: 'detail-label' }, 'Joined:'),
+                    React.createElement('span', { className: 'detail-value' }, 'January 2024')
+                  ),
+                  React.createElement('div', { className: 'detail-row' },
+                    React.createElement('span', { className: 'detail-label' }, 'Last Login:'),
+                    React.createElement('span', { className: 'detail-value' }, 'Today, 2:30 PM')
+                  )
+                ),
+                React.createElement('div', { className: 'profile-actions' },
+                  React.createElement('button', { className: 'profile-btn edit-profile-btn' }, 'Edit Profile'),
+                  React.createElement('button', { className: 'profile-btn logout-btn' }, 'Logout')
+                )
+              )
+            )
+          );
+        };
+
+        // Simple API Key Form (simplified for HTML version)
+        const SimpleAPIKeyForm = ({ mode, selectedKey, onSave, onClose }) => {
+          const [formData, setFormData] = useState({
+            name: selectedKey?.name || '',
+            description: selectedKey?.description || '',
+            type: selectedKey?.type || 'User'
+          });
+
+          const handleSubmit = (e) => {
+            e.preventDefault();
+            onSave(formData);
+          };
+
+          return React.createElement('div', { className: 'api-key-form' },
+            React.createElement('div', { className: 'form-header' },
+              React.createElement('h2', null, mode === 'create' ? 'Create New API Key' : 'Update API Key'),
+              React.createElement('button', { onClick: onClose, className: 'close-btn' }, '✕')
+            ),
+            React.createElement('form', { onSubmit: handleSubmit, className: 'form-content' },
+              React.createElement('div', { className: 'details-tab' },
+                React.createElement('div', { className: 'form-group' },
+                  React.createElement('label', null, 'API Key Name'),
+                  React.createElement('input', {
+                    type: 'text',
+                    value: formData.name,
+                    onChange: (e) => setFormData(prev => ({ ...prev, name: e.target.value })),
+                    placeholder: 'Enter API key name',
+                    required: true
+                  })
+                ),
+                React.createElement('div', { className: 'form-group' },
+                  React.createElement('label', null, 'Description'),
+                  React.createElement('textarea', {
+                    value: formData.description,
+                    onChange: (e) => setFormData(prev => ({ ...prev, description: e.target.value })),
+                    placeholder: 'Enter description',
+                    rows: 3
+                  })
+                ),
+                React.createElement('div', { className: 'form-group' },
+                  React.createElement('label', null, 'Type'),
+                  React.createElement('div', { className: 'radio-group' },
+                    React.createElement('label', { className: 'radio-option' },
+                      React.createElement('input', {
+                        type: 'radio',
+                        name: 'type',
+                        value: 'User',
+                        checked: formData.type === 'User',
+                        onChange: (e) => setFormData(prev => ({ ...prev, type: e.target.value }))
+                      }),
+                      'User'
+                    ),
+                    React.createElement('label', { className: 'radio-option' },
+                      React.createElement('input', {
+                        type: 'radio',
+                        name: 'type',
+                        value: 'Admin',
+                        checked: formData.type === 'Admin',
+                        onChange: (e) => setFormData(prev => ({ ...prev, type: e.target.value }))
+                      }),
+                      'Admin'
+                    )
+                  )
+                )
+              ),
+              React.createElement('div', { className: 'form-actions' },
+                React.createElement('button', { type: 'button', onClick: onClose, className: 'cancel-btn' }, 'Cancel'),
+                React.createElement('button', { type: 'submit', className: 'submit-btn' }, mode === 'create' ? 'Create' : 'Update')
+              )
+            )
           );
         };
 
         // Main App Component
         const App = () => {
-          const [todos, setTodos] = React.useState([]);
-          const [inputValue, setInputValue] = React.useState('');
-          const [darkMode, setDarkMode] = React.useState(false);
-          const [isLoading, setIsLoading] = React.useState(true);
+          const [showProfileModal, setShowProfileModal] = useState(false);
+          const [showAPIKeyForm, setShowAPIKeyForm] = useState(false);
+          const [formMode, setFormMode] = useState('create');
+          const [selectedKey, setSelectedKey] = useState(null);
+          const [searchQuery, setSearchQuery] = useState('');
 
-          // Load todos and theme from localStorage on component mount
-          React.useEffect(() => {
-            const savedTodos = localStorage.getItem('todos');
-            const savedTheme = localStorage.getItem('darkMode');
-            
-            if (savedTodos) {
-              setTodos(JSON.parse(savedTodos));
+          // Sample API keys data
+          const [apiKeys, setApiKeys] = useState([
+            {
+              id: 1,
+              name: 'Production API Key',
+              key: 'pk_live_51H7...',
+              createdAt: '2024-01-15',
+              createdBy: 'nitish naidu',
+              lastUpdated: '2024-01-20',
+              type: 'User',
+              description: 'Main production environment key'
+            },
+            {
+              id: 2,
+              name: 'Development Key',
+              key: 'pk_test_51H8...',
+              createdAt: '2024-01-10',
+              createdBy: 'admin',
+              lastUpdated: '2024-01-18',
+              type: 'Admin',
+              description: 'Development and testing purposes'
+            },
+            {
+              id: 3,
+              name: 'Analytics Key',
+              key: 'pk_analytics_51H9...',
+              createdAt: '2024-01-05',
+              createdBy: 'nitish naidu',
+              lastUpdated: '2024-01-12',
+              type: 'User',
+              description: 'Read-only analytics access'
+            },
+            {
+              id: 4,
+              name: 'Mobile App Key',
+              key: 'pk_mobile_51H10...',
+              createdAt: '2024-01-08',
+              createdBy: 'nitish naidu',
+              lastUpdated: '2024-01-25',
+              type: 'User',
+              description: 'Mobile application integration'
             }
-            
-            if (savedTheme) {
-              setDarkMode(JSON.parse(savedTheme));
+          ]);
+
+          const handleCreateKey = () => {
+            setFormMode('create');
+            setSelectedKey(null);
+            setShowAPIKeyForm(true);
+          };
+
+          const handleEditKey = (key) => {
+            setFormMode('edit');
+            setSelectedKey(key);
+            setShowAPIKeyForm(true);
+          };
+
+          const handleDeleteKey = (keyId) => {
+            if (window.confirm('Are you sure you want to delete this API key? This action cannot be undone.')) {
+              setApiKeys(apiKeys.filter(key => key.id !== keyId));
             }
+          };
 
-            // Simulate loading for smooth animation
-            setTimeout(() => setIsLoading(false), 300);
-          }, []);
-
-          // Save todos to localStorage whenever todos change
-          React.useEffect(() => {
-            localStorage.setItem('todos', JSON.stringify(todos));
-          }, [todos]);
-
-          // Save theme to localStorage whenever theme changes
-          React.useEffect(() => {
-            localStorage.setItem('darkMode', JSON.stringify(darkMode));
-            document.body.className = darkMode ? 'dark-mode' : 'light-mode';
-          }, [darkMode]);
-
-          const addTodo = () => {
-            if (inputValue.trim() !== '') {
-              const newTodo = {
-                id: Date.now(),
-                text: inputValue.trim(),
-                completed: false
+          const handleSaveKey = (keyData) => {
+            if (formMode === 'create') {
+              const newKey = {
+                ...keyData,
+                id: Math.max(...apiKeys.map(k => k.id)) + 1,
+                key: `pk_${keyData.type.toLowerCase()}_${Math.random().toString(36).substr(2, 9)}...`,
+                createdAt: new Date().toISOString().split('T')[0],
+                createdBy: 'nitish naidu',
+                lastUpdated: new Date().toISOString().split('T')[0]
               };
-              setTodos([...todos, newTodo]);
-              setInputValue('');
+              setApiKeys([...apiKeys, newKey]);
+            } else {
+              setApiKeys(apiKeys.map(key => 
+                key.id === selectedKey.id 
+                  ? { ...key, ...keyData, lastUpdated: new Date().toISOString().split('T')[0] }
+                  : key
+              ));
             }
+            setShowAPIKeyForm(false);
           };
 
-          const toggleComplete = (id) => {
-            setTodos(todos.map(todo =>
-              todo.id === id ? { ...todo, completed: !todo.completed } : todo
-            ));
-          };
+          const filteredKeys = apiKeys.filter(key =>
+            key.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            key.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            key.createdBy.toLowerCase().includes(searchQuery.toLowerCase())
+          );
 
-          const deleteTodo = (id) => {
-            setTodos(todos.filter(todo => todo.id !== id));
-          };
+          return React.createElement('div', { className: 'app' },
+            React.createElement(Sidebar, { onProfileClick: () => setShowProfileModal(true) }),
+            
+            React.createElement('main', { className: 'main-content' },
+              React.createElement('div', { className: 'api-keys-page' },
+                React.createElement('div', { className: 'page-header' },
+                  React.createElement('h1', null, 'API Keys')
+                ),
+                React.createElement('div', { className: 'search-section' },
+                  React.createElement('div', { className: 'search-container' },
+                    React.createElement('input', {
+                      type: 'text',
+                      placeholder: 'Search API keys...',
+                      value: searchQuery,
+                      onChange: (e) => setSearchQuery(e.target.value),
+                      className: 'search-input'
+                    }),
+                    React.createElement('button', {
+                      onClick: handleCreateKey,
+                      className: 'create-key-btn'
+                    }, 'Create Key')
+                  )
+                ),
+                React.createElement('div', { className: 'table-container' },
+                  React.createElement(APIKeyTable, {
+                    apiKeys: filteredKeys,
+                    onEditKey: handleEditKey,
+                    onDeleteKey: handleDeleteKey
+                  })
+                )
+              ),
 
-          const handleKeyPress = (e) => {
-            if (e.key === 'Enter') {
-              addTodo();
-            }
-          };
+              showAPIKeyForm && React.createElement('div', { className: 'form-overlay' },
+                React.createElement('div', { className: 'form-panel' },
+                  React.createElement(SimpleAPIKeyForm, {
+                    mode: formMode,
+                    selectedKey: selectedKey,
+                    onSave: handleSaveKey,
+                    onClose: () => setShowAPIKeyForm(false)
+                  })
+                )
+              )
+            ),
 
-          const toggleTheme = () => {
-            setDarkMode(!darkMode);
-          };
-
-          const completedCount = todos.filter(todo => todo.completed).length;
-          const totalCount = todos.length;
-
-          return (
-            <div className={`app ${isLoading ? 'loading' : ''}`}>
-              {/* Floating background shapes */}
-              <div className="floating-shapes">
-                <div className="shape"></div>
-                <div className="shape"></div>
-                <div className="shape"></div>
-              </div>
-
-              <header className="header">
-                <h1 className="title">✨ Sleek Todo</h1>
-                <div className="header-controls">
-                  {totalCount > 0 && (
-                    <div className="stats-header">
-                      <div className="stats-circle"></div>
-                      <span className="stats-text">
-                        {completedCount} of {totalCount} completed
-                      </span>
-                    </div>
-                  )}
-                  <button 
-                    className={`theme-toggle ${darkMode ? 'dark' : ''}`}
-                    onClick={toggleTheme}
-                    aria-label="Toggle theme"
-                  >
-                    <span className="theme-icon sun">☀️</span>
-                    <span className="theme-icon moon">🌙</span>
-                  </button>
-                </div>
-              </header>
-
-              <main className="main-content">
-                <div className="input-section">
-                  <input
-                    type="text"
-                    value={inputValue}
-                    onChange={(e) => setInputValue(e.target.value)}
-                    onKeyPress={handleKeyPress}
-                    placeholder="What needs to be done today?"
-                    className="todo-input"
-                  />
-                  <button onClick={addTodo} className="add-button">
-                    ✨ Add Todo
-                  </button>
-                </div>
-
-                <div className="todo-list">
-                  {todos.length === 0 ? (
-                    <div className="empty-state">
-                      <div className="empty-state-icon">📝</div>
-                      <p>Your todo list is empty</p>
-                      <p style={{fontSize: '1rem', opacity: 0.7}}>Add a task above to get started!</p>
-                    </div>
-                  ) : (
-                    todos.map((todo) => (
-                      <TodoItem
-                        key={todo.id}
-                        todo={todo}
-                        onToggleComplete={toggleComplete}
-                        onDelete={deleteTodo}
-                      />
-                    ))
-                  )}
-                </div>
-              </main>
-            </div>
+            showProfileModal && React.createElement(ProfileModal, {
+              onClose: () => setShowProfileModal(false)
+            })
           );
         };
 
         // Render the app
         const { createRoot } = ReactDOM;
         const root = createRoot(document.getElementById('root'));
-        root.render(<App />);
+        root.render(React.createElement(App));
     </script>
 </body>
 </html>
