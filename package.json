@@ -1,7 +1,7 @@
 {
-  "name": "react-todo-app",
+  "name": "react-api-keys-management",
   "version": "1.0.0",
-  "description": "A simple React todo list application with light/dark mode and animations",
+  "description": "A modern React API Keys Management application with sidebar navigation and comprehensive key management features",
   "main": "App.jsx",
   "scripts": {
     "start": "npx serve . -p 3000",
@@ -15,8 +15,12 @@
   },
   "keywords": [
     "react",
-    "todo",
-    "todo-list",
+    "api-keys",
+    "management",
+    "dashboard",
+    "admin",
+    "keys",
+    "permissions",
     "javascript",
     "frontend"
   ],
